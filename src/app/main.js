@@ -8,9 +8,6 @@ let Application = PIXI.Application,
 let app = new Application({
     width: window.innerWidth,
     height: window.innerHeight,
-    antialiasing: false,
-    transparent: false,
-    resolution: window.devicePixelRatio,
     autoResize: true,
     backgroundColor: 0x361639
 })
@@ -23,48 +20,35 @@ app.stage.addChild(backgroundBehind);
 
 var background = PIXI.Sprite.fromImage('images/background_bot.png');
 background.width = app.screen.width;
-background.y = 800;
+background.y = window.innerHeight/1.218;
 app.stage.addChild(background);
 
 loader
-    .add([
-        'images/bahamut.png',
-        'images/leviathan.png',
-        'images/addBet.png',
-        'images/onehealth.png',
-        'images/onehealth_empty.png'    
-    ])
+
+	.add('images/addBet.png')
+	.add('images/onehealth.png')
+	.add('images/onehealth_empty.png')
+	.add('goblins', 'images/goblins.json')
+	.add('goblinHead', 'images/goblinHead.png')
+	.add('goblinGirlHead', 'images/goblinGirlHead.png')
     .on("progress", loadProgressHandler)
     .load(setup)
-    .load(onAssetsLoaded);
-
+	.load(onAssetsLoaded);
+	
 function loadProgressHandler(loader, resource) {
     console.log("Loading.." + resource.url);
     console.log("Progres: " + loader.progress + "%");
 }
 
 function setup() {
-    console.log("Assets loaded!");
+	console.log("Assets loaded!");
 
-    const hero = new Sprite(loader.resources['images/bahamut.png'].texture);
-    hero.zIndex = 10;
-    hero.width = 400;
-    hero.height = 400;
-    hero.x = 200;
-    hero.y = 470;
-    app.stage.addChild(hero);
-
+	backgroundAudio();
+	
     // let hero_health = new Sprite(loader.resources['images/healthbar_empty.png'].texture);
     // hero_health.x = 250;
     // hero_health.y = 20;
     // app.stage.addChild(hero_health);
-
-    const enemy = new Sprite(loader.resources['images/leviathan.png'].texture);
-    enemy.width = 400;
-    enemy.height = 400;
-    enemy.x = 1300;
-    enemy.y = 470;
-    app.stage.addChild(enemy);
 
     let infobar = new PIXI.Graphics();
     infobar.beginFill(0x1d1d1d);
@@ -72,19 +56,24 @@ function setup() {
     infobar.alpha = 0.8;
     app.stage.addChild(infobar);
 
-    let balanceLeft = 500;
-    const balance = new PIXI.Text('Balance: ' + balanceLeft,{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+    const balance = new PIXI.Text('Balance: ',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
     balance.anchor.set(0.5, 0.5);
     balance.position.set(140,936);
-    app.stage.addChild(balance);
+	app.stage.addChild(balance);
+
+	let balanceLeft = new PIXI.Text(500, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+    balanceLeft.anchor.set(0.5, 0.5);
+    balanceLeft.position.set(balance.x + 100,936);
+    app.stage.addChild(balanceLeft);
 
     let heroPlusButton = new Sprite(loader.resources['images/addBet.png'].texture);
-    heroPlusButton.x = hero.x + 170;
+    heroPlusButton.x = 370;
     heroPlusButton.y = 150;
     heroPlusButton.width = 70;
     heroPlusButton.height = 70;
     app.stage.addChild(heroPlusButton);
-    heroPlusButton.interactive=true;
+	heroPlusButton.interactive = true;
+	heroPlusButton.buttonMode = true;
     heroPlusButton.on('pointerdown', addOneHero);
 
     const heroBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
@@ -98,12 +87,13 @@ function setup() {
     app.stage.addChild(heroBetCounterNumber);
 
     let enemyPlusButton = new Sprite(loader.resources['images/addBet.png'].texture);
-    enemyPlusButton.x = enemy.x + 150;
+    enemyPlusButton.x = 1450;
     enemyPlusButton.y = 150;
     enemyPlusButton.width = 70;
     enemyPlusButton.height = 70;
     app.stage.addChild(enemyPlusButton);
-    enemyPlusButton.interactive=true;
+	enemyPlusButton.interactive = true;
+	enemyPlusButton.buttonMode = true;
     enemyPlusButton.on('pointerdown', addOneEnemy);
 
     const enemyBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
@@ -118,9 +108,23 @@ function setup() {
 
     const slot = new PIXI.Graphics();
     slot.beginFill()
-    slot.drawRect(window.innerWidth / 2.4, 100, 300, 600);
+	slot.drawRect(window.innerWidth / 2.38, 150, 300, 180);
+    slot.drawRect(window.innerWidth / 2.38, 330, 300, 180);
+	slot.drawRect(window.innerWidth / 2.38, 510, 300, 180);
     slot.alpha = 0.9;
     app.stage.addChild(slot);
+
+	const winnerSelector = new PIXI.Graphics();
+	winnerSelector.lineStyle(10, 0x666dd6, 1);
+	winnerSelector.moveTo(20,200);
+	winnerSelector.lineTo(20,240);
+	winnerSelector.lineTo(80,220);
+	winnerSelector.lineTo(20,200);
+	winnerSelector.x = window.innerWidth / 2.55;
+	winnerSelector.y = 170;
+	
+
+	app.stage.addChild(winnerSelector);
 
     let numberOfLivesHero = 5,
         spacing = 90;
@@ -179,31 +183,88 @@ function setup() {
 
         app.stage.addChild(lifeEnemy);
 
-    }
-
-
+	}
+	function backgroundAudio () {
+		var audio_bg = document.getElementById("audio_bg");
+		audio_bg.play();
+		audio_bg.loop = true;
+		if(audio_roll.play) {
+			audio_bg.paused = true;
+		}
+	}
 
     function addOneHero () {
-        console.log("it is true");
-        heroBetCounterNumber.text++;
-        }
+		console.log("it is true");
+		heroBetCounterNumber.text++;
+		balanceLeft.text--;
+		if(balanceLeft.text <0) {
+			alert("You are out of cash!");
+			balanceLeft.text++;
+			heroBetCounterNumber.text--;
+		}
+		var audio_bet = document.getElementById("audio_bet");
+		if (audio_bet.paused) {
+			audio_bet.play();        
+		} else {
+			audio_bet.currentTime = 0;
+		}
+	}
 
     function addOneEnemy () {
         console.log("it is true");
         enemyBetCounterNumber.text++;
-        }
+		balanceLeft.text--;
+		if(balanceLeft.text <0) {
+			alert("You are out of cash!");
+			balanceLeft.text++;
+			enemyBetCounterNumber.text--;
+		}
+		var audio_bet = document.getElementById("audio_bet");
+		if (audio_bet.paused) {
+			audio_bet.play();        
+		} else {
+			audio_bet.currentTime = 0;
+		}
+		}
     
 }
 var REEL_WIDTH = 300;
 var SYMBOL_SIZE = 150;
 
 //onAssetsLoaded handler builds the example.
-function onAssetsLoaded()
+function onAssetsLoaded(loader, res)
 {
+	//Adding new variable to bring in goblin Spine animation
+	var goblin = new PIXI.spine.Spine(res.goblins.spineData);
+
+	goblin.skeleton.setSkinByName('goblin');
+	goblin.skeleton.setSlotsToSetupPose();
+
+	goblin.x = 350;
+	goblin.y = 860;
+
+	goblin.scale.set(1.8);
+	goblin.state.setAnimation(0, 'walk', true);
+	app.stage.addChild(goblin);
+
+	//Adding new variable to bring in goblinGirl Spine animation
+	var goblinGirl = new PIXI.spine.Spine(res.goblins.spineData);
+
+	goblinGirl.skeleton.setSkinByName('goblingirl');
+	goblinGirl.skeleton.setSlotsToSetupPose();
+
+	goblinGirl.scale.x = -1.8;
+	goblinGirl.scale.y = 1.8;
+	goblinGirl.x = 1550;
+	goblinGirl.y = 860;
+
+	goblinGirl.state.setAnimation(0, 'walk', true);
+	app.stage.addChild(goblinGirl);
+
 	//Create different slot symbols.
 	var slotTextures = [
-		PIXI.Texture.fromImage('images/bahamut.png'),
-		PIXI.Texture.fromImage('images/leviathan.png')
+		PIXI.Texture.fromImage('images/goblinHead.png'),
+		PIXI.Texture.fromImage('images/goblinGirlHead.png')
 	];
 
 	//Build the reels horizontally
@@ -241,15 +302,12 @@ function onAssetsLoaded()
 	}
 	app.stage.addChild(reelContainer);
 	
-	//Build top & bottom covers and position reelContainer
+	//Build "CLICK TO SPIN" button and position reelContainer(Slot symbols)
 	var margin = (app.screen.height - SYMBOL_SIZE*3)/5;
-	reelContainer.y = 470;
-	reelContainer.x = Math.round(app.screen.width / 2.2);
+	reelContainer.y = 500;
+	reelContainer.x = Math.round(app.screen.width / 2.18);
     var bottom = new PIXI.Graphics();
-    bottom.beginFill(0x000000);
-    bottom.alpha = 0.95;
     bottom.x = 750;
-    bottom.y = 0;
 	bottom.drawRect(0,826,400,77);
 	
 	//Add play text
@@ -261,7 +319,7 @@ function onAssetsLoaded()
 		stroke: '#4a1850',
 		strokeThickness: 5,
 		dropShadow: true,
-		dropShadowColor: '#000000',
+		dropShadowColor: '#000000', 
 		dropShadowBlur: 4,
 		dropShadowAngle: Math.PI / 6,
 		dropShadowDistance: 6,
@@ -285,16 +343,26 @@ function onAssetsLoaded()
 	
 	var running = false;
 	
+	function slotRoll(){
+		var audio_roll = document.getElementById("audio_roll");
+		if(audio_roll.paused) {
+			audio_roll.play();
+		} else {
+			audio_roll.currentTime = 0;
+		}
+	}
+
 	//Function to start playing.
 	function startPlay(){
 		if(running) return;
 		running = true;
+		slotRoll();
 		
 		for(var i = 0; i < reels.length; i++)
 		{
 			var r = reels[i];
-			var extra = Math.floor(Math.random()*2);
-			tweenTo(r, "position", r.position + 10+i*10+extra, 2500+i*600+extra*600, backout(0.7), null, i == reels.length-1 ? reelsComplete : null);
+			var extra = Math.floor(Math.random()*4);
+			tweenTo(r, "position", r.position + 10+i*10+extra, 2500+i*600+extra*600, backout(0.6), null, i == reels.length-1 ? reelsComplete : null);
 		}
 	}
 	
@@ -310,8 +378,7 @@ function onAssetsLoaded()
 		{
 			var r = reels[i];
 			//Update blur filter y amount based on speed.
-			//This would be better if calculated with time in mind also. Now blur depends on frame rate.
-			r.blur.blurY = (r.position-r.previousPosition)*80;
+			r.blur.blurY = (r.position-r.previousPosition)*50;
 			r.previousPosition = r.position;
 			
 			//Update symbol positions on reel.
@@ -322,9 +389,8 @@ function onAssetsLoaded()
 				s.y = (r.position + j)%r.symbols.length*SYMBOL_SIZE-SYMBOL_SIZE*2;
 				if(s.y < 0 && prevy > SYMBOL_SIZE){
 					//Detect going over and swap a texture. 
-					//This should in proper product be determined from some logical reel.
 					s.texture = slotTextures[Math.floor(Math.random()*slotTextures.length)];
-					s.scale.x = s.scale.y = Math.min( SYMBOL_SIZE / s.texture.width, SYMBOL_SIZE/s.texture.height);
+					s.scale.x = s.scale.y = Math.min( SYMBOL_SIZE / s.texture.width, SYMBOL_SIZE/s.texture.height)*6;
 					s.x = Math.round((SYMBOL_SIZE - s.width)/2);
 				}
 			}
@@ -378,7 +444,7 @@ app.ticker.add(function(delta) {
 
 //Basic lerp funtion.
 function lerp(a1,a2,t){
-	return a1*(1-t) + a2*t;
+	return a1*(10-t) + a2*t;
 }
 
 //Backout function from tweenjs.

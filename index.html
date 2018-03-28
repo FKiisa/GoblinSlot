@@ -5,8 +5,8 @@
   <title>Goblin Slot</title>
 </head>
 <body>
-    <script src="src/libs/pixi.min.js"></script>    
-    <script src="src/libs/charm.js"></script>        
+    <script src="src/libs/pixi.min.js"></script> 
+    <script src="src/libs/pixi-spine.js"></script>        
     <script src="src/app/main.js"></script> 
     <link rel="stylesheet" href="src/css/main.css">
 <script type="text/javascript">
@@ -17,5 +17,11 @@
 
     PIXI.utils.sayHello(type)
   </script>
+  <input type="button" value="PLAY_BET"  onclick="addOneHero()">
+  <audio id="audio_bet" src="audio/beep.mp3" ></audio>
+  <input type="button" value="PLAY_ROLL"  onclick="bottom()">
+  <audio id="audio_roll" src="audio/roll.mp3" ></audio>
+  <input type="button" value="PLAY_BG"  onclick="backgroundAudio()">
+  <audio id="audio_bg" src="audio/bgsounds.mp3" ></audio>
 </body>
 </html>

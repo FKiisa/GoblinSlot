@@ -34,7 +34,8 @@
     "README.md"
   ],
   "dependencies": {
-    "glslify": "^5.0.2"
+    "glslify": "^5.0.2",
+    "pixi-sound": "^2.0.1"
   },
   "devDependencies": {
     "browserify-versionify": "^1.0.6",
