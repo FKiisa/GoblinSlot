@@ -1,3 +1,8 @@
+var renderer = PIXI.autoDetectRenderer(
+	window.innerWidth, window.innerHeight,
+	{antialiasing: false, transparent: false, resolution: 1}  
+  );
+
 let Application = PIXI.Application,
     loader = PIXI.loader,
     resources = PIXI.loader.resources,
@@ -25,7 +30,6 @@ app.stage.addChild(background);
 
 loader
 
-	.add('images/addBet.png')
 	.add('images/onehealth.png')
 	.add('images/onehealth_empty.png')
 	.add('goblins', 'images/goblins.json')
@@ -40,15 +44,54 @@ function loadProgressHandler(loader, resource) {
     console.log("Progres: " + loader.progress + "%");
 }
 
+let heroPlusButton = PIXI.Sprite.fromImage('images/addBet.png');
+heroPlusButton.x = 370;
+heroPlusButton.y = 150;
+heroPlusButton.width = 70;
+heroPlusButton.height = 70;
+app.stage.addChild(heroPlusButton);
+heroPlusButton.interactive = true;
+heroPlusButton.buttonMode = true;
+heroPlusButton.on('pointerdown', addOneHero);
+
+const heroBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+heroBetCounterLabel.x = heroPlusButton.x - 70;
+heroBetCounterLabel.y = heroPlusButton.y - 5;
+app.stage.addChild(heroBetCounterLabel);
+
+let heroBetCounterNumber = new PIXI.Text(0, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+heroBetCounterNumber.x = heroBetCounterLabel.x + 20;
+heroBetCounterNumber.y = heroBetCounterLabel.y + 36;
+app.stage.addChild(heroBetCounterNumber);
+
+let enemyPlusButton = PIXI.Sprite.fromImage('images/addBet.png');
+enemyPlusButton.x = 1450;
+enemyPlusButton.y = 150;
+enemyPlusButton.width = 70;
+enemyPlusButton.height = 70;
+app.stage.addChild(enemyPlusButton);
+enemyPlusButton.interactive = true;
+enemyPlusButton.buttonMode = true;
+enemyPlusButton.on('pointerdown', addOneEnemy);
+
+const enemyBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+enemyBetCounterLabel.x = enemyPlusButton.x + 90;
+enemyBetCounterLabel.y = enemyPlusButton.y - 5;
+app.stage.addChild(enemyBetCounterLabel);
+
+let enemyBetCounterNumber = new PIXI.Text(0, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+enemyBetCounterNumber.x = enemyBetCounterLabel.x + 20;
+enemyBetCounterNumber.y = enemyBetCounterLabel.y + 36;
+app.stage.addChild(enemyBetCounterNumber);
+
+const balance = new PIXI.Text('Balance: ',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+let balanceLeft = new PIXI.Text(500, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
+
+let totalBets = new PIXI.Text(0);
+
 function setup() {
 	console.log("Assets loaded!");
-
 	backgroundAudio();
-	
-    // let hero_health = new Sprite(loader.resources['images/healthbar_empty.png'].texture);
-    // hero_health.x = 250;
-    // hero_health.y = 20;
-    // app.stage.addChild(hero_health);
 
     let infobar = new PIXI.Graphics();
     infobar.beginFill(0x1d1d1d);
@@ -56,55 +99,13 @@ function setup() {
     infobar.alpha = 0.8;
     app.stage.addChild(infobar);
 
-    const balance = new PIXI.Text('Balance: ',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
     balance.anchor.set(0.5, 0.5);
     balance.position.set(140,936);
 	app.stage.addChild(balance);
 
-	let balanceLeft = new PIXI.Text(500, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
     balanceLeft.anchor.set(0.5, 0.5);
     balanceLeft.position.set(balance.x + 100,936);
     app.stage.addChild(balanceLeft);
-
-    let heroPlusButton = new Sprite(loader.resources['images/addBet.png'].texture);
-    heroPlusButton.x = 370;
-    heroPlusButton.y = 150;
-    heroPlusButton.width = 70;
-    heroPlusButton.height = 70;
-    app.stage.addChild(heroPlusButton);
-	heroPlusButton.interactive = true;
-	heroPlusButton.buttonMode = true;
-    heroPlusButton.on('pointerdown', addOneHero);
-
-    const heroBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
-    heroBetCounterLabel.x = heroPlusButton.x - 70;
-    heroBetCounterLabel.y = heroPlusButton.y - 5;
-    app.stage.addChild(heroBetCounterLabel);
-
-    let heroBetCounterNumber = new PIXI.Text(0, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
-    heroBetCounterNumber.x = heroBetCounterLabel.x + 20;
-    heroBetCounterNumber.y = heroBetCounterLabel.y + 36;
-    app.stage.addChild(heroBetCounterNumber);
-
-    let enemyPlusButton = new Sprite(loader.resources['images/addBet.png'].texture);
-    enemyPlusButton.x = 1450;
-    enemyPlusButton.y = 150;
-    enemyPlusButton.width = 70;
-    enemyPlusButton.height = 70;
-    app.stage.addChild(enemyPlusButton);
-	enemyPlusButton.interactive = true;
-	enemyPlusButton.buttonMode = true;
-    enemyPlusButton.on('pointerdown', addOneEnemy);
-
-    const enemyBetCounterLabel = new PIXI.Text('Bet',{fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
-    enemyBetCounterLabel.x = enemyPlusButton.x + 90;
-    enemyBetCounterLabel.y = enemyPlusButton.y - 5;
-    app.stage.addChild(enemyBetCounterLabel);
-
-    let enemyBetCounterNumber = new PIXI.Text(0, {fontFamily: 'Arial-Bold', fontSize: 36, fill: 0xffffff, align: 'center'});
-    enemyBetCounterNumber.x = enemyBetCounterLabel.x + 20;
-    enemyBetCounterNumber.y = enemyBetCounterLabel.y + 36;
-    app.stage.addChild(enemyBetCounterNumber);
 
     const slot = new PIXI.Graphics();
     slot.beginFill()
@@ -123,7 +124,6 @@ function setup() {
 	winnerSelector.x = window.innerWidth / 2.55;
 	winnerSelector.y = 170;
 	
-
 	app.stage.addChild(winnerSelector);
 
     let numberOfLivesHero = 5,
@@ -132,57 +132,43 @@ function setup() {
         yOffset = 20;
 
         for (let i = 0; i < numberOfLivesHero; i++) {
-
             let life_e = new Sprite(loader.resources['images/onehealth_empty.png'].texture);
             let life_ex = spacing * i + xOffset;
             let life_ey = i + yOffset;
             life_e.x = life_ex;
             life_e.y = life_ey;
-    
             app.stage.addChild(life_e);
-    
         }
 
     for (let i = 0; i < numberOfLivesHero; i++) {
-
         let life = new Sprite(loader.resources['images/onehealth.png'].texture);
         let lifex = spacing * i + xOffset;
         let lifey = i + yOffset;
         life.x = lifex;
         life.y = lifey;
-
         app.stage.addChild(life);
-
     }
-
 
     let numberOfLivesEnemy = 5,
         spacingEnemy = 90;
         xOffset = 1300;
         yOffset = 20;
-
         for (let i = 0; i < numberOfLivesEnemy; i++) {
-
             let lifeEnemy_e = new Sprite(loader.resources['images/onehealth_empty.png'].texture);
             let lifeEnemy_eX = spacing * i + xOffset;
             let lifeEnemy_eY = i + yOffset;
             lifeEnemy_e.x = lifeEnemy_eX;
             lifeEnemy_e.y = lifeEnemy_eY;
-    
             app.stage.addChild(lifeEnemy_e);
-    
         }
 
     for (let i = 0; i < numberOfLivesEnemy; i++) {
-
         let lifeEnemy = new Sprite(loader.resources['images/onehealth.png'].texture);
         let lifeEnemyX = spacing * i + xOffset;
         let lifeEnemyY = i + yOffset;
         lifeEnemy.x = lifeEnemyX;
         lifeEnemy.y = lifeEnemyY;
-
         app.stage.addChild(lifeEnemy);
-
 	}
 	function backgroundAudio () {
 		var audio_bg = document.getElementById("audio_bg");
@@ -192,42 +178,48 @@ function setup() {
 			audio_bg.paused = true;
 		}
 	}
-
-    function addOneHero () {
-		console.log("it is true");
-		heroBetCounterNumber.text++;
-		balanceLeft.text--;
-		if(balanceLeft.text <0) {
-			alert("You are out of cash!");
-			balanceLeft.text++;
-			heroBetCounterNumber.text--;
-		}
-		var audio_bet = document.getElementById("audio_bet");
-		if (audio_bet.paused) {
-			audio_bet.play();        
-		} else {
-			audio_bet.currentTime = 0;
-		}
-	}
-
-    function addOneEnemy () {
-        console.log("it is true");
-        enemyBetCounterNumber.text++;
-		balanceLeft.text--;
-		if(balanceLeft.text <0) {
-			alert("You are out of cash!");
-			balanceLeft.text++;
-			enemyBetCounterNumber.text--;
-		}
-		var audio_bet = document.getElementById("audio_bet");
-		if (audio_bet.paused) {
-			audio_bet.play();        
-		} else {
-			audio_bet.currentTime = 0;
-		}
-		}
-    
 }
+
+function addOneHero () {
+	console.log("it is true");
+	heroBetCounterNumber.text++;
+	totalBets.text++;
+	console.log(totalBets.text);
+	balanceLeft.text--;
+	if(balanceLeft.text <0) {
+		alert("You are out of cash!");
+		balanceLeft.text++;
+		totalBets.text --;
+		heroBetCounterNumber.text--;
+		console.log(totalBets.text);
+	}
+	var audio_bet = document.getElementById("audio_bet");
+	if (audio_bet.paused) {
+		audio_bet.play();        
+	} else {
+		audio_bet.currentTime = 0;
+	}
+}
+
+function addOneEnemy () {
+	console.log("it is true");
+	enemyBetCounterNumber.text++;
+	totalBets.text++;
+	console.log(totalBets.text);
+	balanceLeft.text--;
+	if(balanceLeft.text <0) {
+		alert("You are out of cash!");
+		balanceLeft.text++;
+		totalBets.text --;
+		enemyBetCounterNumber.text--;
+	}
+	var audio_bet = document.getElementById("audio_bet");
+	if (audio_bet.paused) {
+		audio_bet.play();        
+	} else {
+		audio_bet.currentTime = 0;
+	}
+	}    
 var REEL_WIDTH = 300;
 var SYMBOL_SIZE = 150;
 
@@ -263,8 +255,8 @@ function onAssetsLoaded(loader, res)
 
 	//Create different slot symbols.
 	var slotTextures = [
-		PIXI.Texture.fromImage('images/goblinHead.png'),
-		PIXI.Texture.fromImage('images/goblinGirlHead.png')
+		PIXI.Texture.fromImage('goblinHead', 'images/goblinHead.png'),
+		PIXI.Texture.fromImage('goblinGirlHead', 'images/goblinGirlHead.png')
 	];
 
 	//Build the reels horizontally
@@ -347,6 +339,7 @@ function onAssetsLoaded(loader, res)
 		var audio_roll = document.getElementById("audio_roll");
 		if(audio_roll.paused) {
 			audio_roll.play();
+			audio_roll.volume = 0.4;
 		} else {
 			audio_roll.currentTime = 0;
 		}
@@ -357,18 +350,40 @@ function onAssetsLoaded(loader, res)
 		if(running) return;
 		running = true;
 		slotRoll();
+		removeBets();
 		
-		for(var i = 0; i < reels.length; i++)
-		{
+		for(var i = 0; i < reels.length; i++){
 			var r = reels[i];
 			var extra = Math.floor(Math.random()*4);
 			tweenTo(r, "position", r.position + 10+i*10+extra, 2500+i*600+extra*600, backout(0.6), null, i == reels.length-1 ? reelsComplete : null);
 		}
 	}
+
+	function removeBets() {
+		if(running) {
+			heroBetCounterNumber.text = 0;
+			enemyBetCounterNumber.text = 0;
+			console.log('Total ammount betted ' + totalBets.text);
+		}
+	}
 	
 	//Reels done handler.
 	function reelsComplete(){
+		let centerSymbol = reels[0].symbols[1];
+		console.log(centerSymbol.texture.textureCacheIds);
 		running = false;
+		balanceUpdate();
+		totalBets.text = 0;
+	}
+
+	function balanceUpdate() {
+		if(heroBetCounterNumber.text > 0 && centerSymbol.texture.textureCacheIds[0] === "goblinHead", "images/goblinHead.png") {
+			console.log("It should work..");
+			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-heroBetCounterNumber.text)*2)); 
+		} else if (enemyBetCounterNumber.text > 0 && centerSymbol.texture.textureCacheIds[0] === "goblinGirlHead", "images/goblinGirlHead.png") {
+			console.log("It should work..");
+			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-enemyBetCounterNumber.text)*2)); 
+		}
 	}
 	
 	// Listen for animate update.
@@ -454,6 +469,3 @@ backout = function(amount) {
 			return (--t*t*((amount+1)*t + amount) + 1);
 		};
 };
-
-
-
