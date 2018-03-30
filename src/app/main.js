@@ -89,6 +89,53 @@ let balanceLeft = new PIXI.Text(500, {fontFamily: 'Arial-Bold', fontSize: 36, fi
 
 let totalBets = new PIXI.Text(0);
 
+let numberOfLivesHero = 5;
+let numberOfLivesHeroLeft = 5,
+spacing = 90;
+xOffset = 150;
+yOffset = 20;
+
+for (let i = 0; i < numberOfLivesHero; i++) {
+	let life_e = PIXI.Sprite.fromImage('images/onehealth_empty.png');
+	let life_ex = spacing * i + xOffset;
+	let life_ey = i + yOffset;
+	life_e.x = life_ex;
+	life_e.y = life_ey;
+	app.stage.addChild(life_e);
+}
+
+for (let i = 0; i < numberOfLivesHeroLeft; i++) {
+let life = PIXI.Sprite.fromImage('images/onehealth.png');
+let lifex = spacing * i + xOffset;
+let lifey = i + yOffset;
+life.x = lifex;
+life.y = lifey;
+app.stage.addChild(life);
+}
+
+let numberOfLivesEnemy = 5;
+let numberOfLivesEnemyLeft = 5,
+spacingEnemy = 90;
+xOffset = 1300;
+yOffset = 20;
+for (let i = 0; i < numberOfLivesEnemy; i++) {
+	let lifeEnemy_e = PIXI.Sprite.fromImage('images/onehealth_empty.png');
+	let lifeEnemy_eX = spacing * i + xOffset;
+	let lifeEnemy_eY = i + yOffset;
+	lifeEnemy_e.x = lifeEnemy_eX;
+	lifeEnemy_e.y = lifeEnemy_eY;
+	app.stage.addChild(lifeEnemy_e);
+}
+
+for (let i = 0; i < numberOfLivesEnemyLeft; i++) {
+let lifeEnemy = PIXI.Sprite.fromImage('images/onehealth.png');
+let lifeEnemyX = spacing * i + xOffset;
+let lifeEnemyY = i + yOffset;
+lifeEnemy.x = lifeEnemyX;
+lifeEnemy.y = lifeEnemyY;
+app.stage.addChild(lifeEnemy);
+}
+
 function setup() {
 	console.log("Assets loaded!");
 	backgroundAudio();
@@ -126,50 +173,6 @@ function setup() {
 	
 	app.stage.addChild(winnerSelector);
 
-    let numberOfLivesHero = 5,
-        spacing = 90;
-        xOffset = 150;
-        yOffset = 20;
-
-        for (let i = 0; i < numberOfLivesHero; i++) {
-            let life_e = new Sprite(loader.resources['images/onehealth_empty.png'].texture);
-            let life_ex = spacing * i + xOffset;
-            let life_ey = i + yOffset;
-            life_e.x = life_ex;
-            life_e.y = life_ey;
-            app.stage.addChild(life_e);
-        }
-
-    for (let i = 0; i < numberOfLivesHero; i++) {
-        let life = new Sprite(loader.resources['images/onehealth.png'].texture);
-        let lifex = spacing * i + xOffset;
-        let lifey = i + yOffset;
-        life.x = lifex;
-        life.y = lifey;
-        app.stage.addChild(life);
-    }
-
-    let numberOfLivesEnemy = 5,
-        spacingEnemy = 90;
-        xOffset = 1300;
-        yOffset = 20;
-        for (let i = 0; i < numberOfLivesEnemy; i++) {
-            let lifeEnemy_e = new Sprite(loader.resources['images/onehealth_empty.png'].texture);
-            let lifeEnemy_eX = spacing * i + xOffset;
-            let lifeEnemy_eY = i + yOffset;
-            lifeEnemy_e.x = lifeEnemy_eX;
-            lifeEnemy_e.y = lifeEnemy_eY;
-            app.stage.addChild(lifeEnemy_e);
-        }
-
-    for (let i = 0; i < numberOfLivesEnemy; i++) {
-        let lifeEnemy = new Sprite(loader.resources['images/onehealth.png'].texture);
-        let lifeEnemyX = spacing * i + xOffset;
-        let lifeEnemyY = i + yOffset;
-        lifeEnemy.x = lifeEnemyX;
-        lifeEnemy.y = lifeEnemyY;
-        app.stage.addChild(lifeEnemy);
-	}
 	function backgroundAudio () {
 		var audio_bg = document.getElementById("audio_bg");
 		audio_bg.play();
@@ -300,7 +303,8 @@ function onAssetsLoaded(loader, res)
 	reelContainer.x = Math.round(app.screen.width / 2.18);
     var bottom = new PIXI.Graphics();
     bottom.x = 750;
-	bottom.drawRect(0,826,400,77);
+	bottom.drawRect(0,690,400,77);
+	bottom.alpha = 0.9;
 	
 	//Add play text
 	var style = new PIXI.TextStyle({
@@ -321,7 +325,7 @@ function onAssetsLoaded(loader, res)
 	
 	var playText = new PIXI.Text('CLICK TO SPIN!', style);
 	playText.x = Math.round((bottom.width - playText.width)/2);
-    playText.y = app.screen.height/1.19 + Math.round((margin-playText.height)/2);
+    playText.y = app.screen.height/1.38;
 	bottom.addChild(playText);
     
     app.stage.addChild(bottom);
@@ -358,31 +362,55 @@ function onAssetsLoaded(loader, res)
 			tweenTo(r, "position", r.position + 10+i*10+extra, 2500+i*600+extra*600, backout(0.6), null, i == reels.length-1 ? reelsComplete : null);
 		}
 	}
+	
+	let centerSymbol = reels[0].symbols[1];
+	//Reels done handler.
+	function reelsComplete(){
+		console.log(centerSymbol.texture.textureCacheIds);
+		running = false;
+		balanceUpdate();
+		healthUpdate();
+		totalBets.text = 0;
+	}
+
+	//Function to update balance
+	function balanceUpdate() {
+		if(centerSymbol.texture.textureCacheIds[0] === "goblinHead", "images/goblinHead.png") {
+			console.log("the boy won!");
+			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-heroBetCounterNumber.text)*2)); 
+		} else if (centerSymbol.texture.textureCacheIds[0] === "goblinGirlHead", "images/goblinGirlHead.png") {
+			console.log("the girl got the cash.");
+			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-enemyBetCounterNumber.text)*2)); 
+		} else {
+			balanceLeft.text = Number(balanceLeft.text) - Number(totalBets.text);
+			console.log("looks like we lost.");
+		}
+	}
+
+	function gameOver() {
+		if(numberOfLivesEnemyLeft === 0) {
+			alert("Game Over, Hero has won!");
+		} else if (numberOfLivesHeroLeft === 0) {
+			alert("Game Over, Enemy has won!");
+		}
+	}
+
+	function healthUpdate() {
+		if(centerSymbol.texture.textureCacheIds[0] === "goblinHead", "images/goblinHead.png") {
+			numberOfLivesEnemyLeft--;
+		} else if (centerSymbol.texture.textureCacheIds[0] === "goblinGirlHead", "images/goblinGirlHead.png") {
+			numberOfLivesHeroLeft--;
+		}
+		gameOver();
+	}
+
+
 
 	function removeBets() {
 		if(running) {
 			heroBetCounterNumber.text = 0;
 			enemyBetCounterNumber.text = 0;
 			console.log('Total ammount betted ' + totalBets.text);
-		}
-	}
-	
-	//Reels done handler.
-	function reelsComplete(){
-		let centerSymbol = reels[0].symbols[1];
-		console.log(centerSymbol.texture.textureCacheIds);
-		running = false;
-		balanceUpdate();
-		totalBets.text = 0;
-	}
-
-	function balanceUpdate() {
-		if(heroBetCounterNumber.text > 0 && centerSymbol.texture.textureCacheIds[0] === "goblinHead", "images/goblinHead.png") {
-			console.log("It should work..");
-			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-heroBetCounterNumber.text)*2)); 
-		} else if (enemyBetCounterNumber.text > 0 && centerSymbol.texture.textureCacheIds[0] === "goblinGirlHead", "images/goblinGirlHead.png") {
-			console.log("It should work..");
-			balanceLeft.text = Number(balanceLeft.text) + Number(((totalBets.text-enemyBetCounterNumber.text)*2)); 
 		}
 	}
 	
@@ -413,7 +441,7 @@ function onAssetsLoaded(loader, res)
 	});
 }
 
-//Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
+//simple tweening utility function
 var tweening = [];
 function tweenTo(object, property, target, time, easing, onchange, oncomplete)
 {
